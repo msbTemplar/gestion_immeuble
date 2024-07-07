@@ -18,6 +18,8 @@ from django.contrib import admin
 from django.urls import path
 from . import views
 
+#https://www.youtube.com/watch?v=CdtQSiC8ZNQ
+
 urlpatterns = [
     path('', views.home, name='home'),
     path('login_user', views.login_user, name='login'),

@@ -455,7 +455,12 @@ def liste_situation_caisse(request):
     la_lista_des_formulaire_charges = FormulaireCharge.objects.all()
     total_montant_charge = la_lista_des_formulaire_charges.aggregate(total=Sum('montant'))['total']
     
-    total =  total_montant_cotizacion - total_montant_charge   
+    #total =  total_montant_cotizacion - total_montant_charge   
+    # Calculating total only if both values are not None
+    if total_montant_cotizacion is not None and total_montant_charge is not None:
+        total = total_montant_cotizacion - total_montant_charge
+    else:
+        total = 0  # Default to 0 if either value is None
     name = request.user.username
 
     context = {'la_lista_formulaire_cotization': la_lista_formulaire_cotization, 'la_lista_des_formulaire_charges': la_lista_des_formulaire_charges, 'name':name, 'total_montant_cotizacion': total_montant_cotizacion,'total_montant_charge': total_montant_charge, 'total' : total,}
