@@ -1,0 +1,15 @@
+{% extends 'gestion_immeuble_app/base.html' %} {% block content %}
+
+<h1>Enregister Formulaire charge</h1>
+<br /><br />
+
+<form action="" method="post" enctype="multipart/form-data" id="registroForm">
+  {% csrf_token %}
+  {{ form.as_p }}
+  
+  <input type="submit" value="Submit" class="btn btn-primary" />
+</form>
+
+<br /><br />
+
+{% endblock %}

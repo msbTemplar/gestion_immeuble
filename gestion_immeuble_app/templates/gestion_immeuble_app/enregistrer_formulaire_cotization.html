@@ -1,0 +1,86 @@
+{% extends 'gestion_immeuble_app/base.html' %} {% block content %}
+
+<h1>Enregister Formulaire Cotization</h1>
+<br /><br />
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<form action="" method="post" enctype="multipart/form-data" id="registroForm">
+  {% csrf_token %}
+  <!-- Campo de solo lectura para mostrar el ID ajustado -->
+  <div class="form-group">
+    <label for="id_ajustado_display">ID Ajustado:</label>
+    <input type="text" id="id_ajustado_display" class="form-control" readonly>
+  </div>
+  {{ form.as_p }}
+  <input type="hidden" id="id_ajustado" name="id_ajustado" value="">
+
+  
+  
+  <script type="text/javascript">
+    $(document).ready(function() {
+        // Hacer una llamada AJAX al cargar la página para obtener el último ID
+    $.ajax({
+        url: '/get_last_id/', // Ruta en tu servidor que devuelve el último ID
+        method: 'GET',
+        success: function(data) {
+          // Incrementar el último ID en 2000
+          var adjustedId = parseInt(data.last_id) + 2204 + 1;
+          // Establecer el valor del campo de solo lectura con el ID ajustado
+          $('#id_ajustado_display').val(adjustedId);
+        },
+        error: function(error) {
+          console.log('Error:', error);
+        }
+      });
+
+        $('#id_liste_proprietaire').change(function() {
+            var proprietaireId = $(this).val();
+            if (proprietaireId) {
+                $.ajax({
+                    url: '/get_proprietaire_data/' + proprietaireId + '/',
+                    method: 'GET',
+                    success: function(data) {
+                        $('#id_nom').val(data.nom);
+                        $('#id_prenom').val(data.prenom);
+                        $('#id_aptNum').val(data.aptNum);
+
+                        var adjustedId = parseInt(proprietaireId) + 2204 + 1;
+                        $('#id_ajustado').val(adjustedId);
+                        $('#id_ajustado_display').val(adjustedId);
+                    },
+                    error: function(error) {
+                        console.log('Error:', error);
+                    }
+                });
+            }
+        });
+
+            
+    
+    });
+
+    function generatePDF() {
+      var form = $('#registroForm');
+      $.ajax({
+          url: '/generate_temp_pdf/',  // Ruta que maneja la generación del PDF temporal
+          method: 'POST',
+          data: form.serialize(), // Enviar los datos del formulario
+          success: function(response) {
+              // Abrir el PDF en una nueva ventana
+              window.open(response.pdf_url, '_blank');
+          },
+          error: function(error) {
+              console.log('Error:', error);
+          }
+      });
+  }
+</script>
+<input type="button" value="Imprimir PDF" class="btn btn-secondary" onclick="generatePDF()" />
+
+<input type="submit" value="Submit" class="btn btn-primary" />
+</form>
+
+<br /><br />
+
+{% endblock %}

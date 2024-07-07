@@ -1,0 +1,200 @@
+{% extends 'gestion_immeuble_app/base.html' %} 
+
+
+{% block content %}
+  <div class="row">
+    <div class="col col-8"><h1>la liste des Cotizations</h1></div>
+    <div class="col col-4"><h2 class="btn-primary text-center rounded text-warning">Utilizateur connecté(e): 
+      {% if user.is_authenticated %}
+      {{name}}
+      {% else %}
+      Tu n´est pas connécté(e)
+      {% endif %}
+    </h2></div>
+  </div>
+  
+  <!-- antes venue_list-->
+
+  <table class="table table-striped table-hover table-bordered border-primary shadow rounded custom-table">
+    <thead>
+      <tr>
+        <th scope="col" class="text-center">Date</th>
+        <th scope="col" class="text-center">Liste Proprietaire</th>
+        <th scope="col" class="text-center">Nom</th>
+        <th scope="col" class="text-center">Prenom</th>
+        <th scope="col" class="text-center">Nº Apt</th>
+        <th scope="col" class="text-center">Montant</th>
+        <th scope="col" class="text-center">Reglé?</th>
+        <th scope="col" class="text-center">Mois</th>
+        <th scope="col" class="text-center">Année</th>
+        <th scope="col" class="text-center">Frais Sindic</th>
+        <th scope="col" class="text-center">Frais Sindic Manual</th>
+       
+        {% if user.is_superuser %}
+        <th scope="col" class="text-center">Actualiser</th>
+        {% endif %}
+        {% if user.is_superuser %}
+        <th scope="col" class="text-center">{% if user.is_superuser %}Eliminer{% endif %}</th>
+        {% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for formulaire_cotization in la_lista_formulaire_cotization %}
+      <tr>
+        <th class="text-wrap" style="max-width: 150px;" scope="row">{{formulaire_cotization.date}}</th>
+        <th class="text-wrap" style="max-width: 150px;" scope="row">{{formulaire_cotization.liste_proprietaire}}</th>
+        <th class="text-wrap" style="max-width: 150px;" scope="row">{{formulaire_cotization.nom}}</th>
+        <th class="text-wrap" style="max-width: 150px;" scope="row">{{formulaire_cotization.prenom}}</th>
+        <th class="text-wrap" style="max-width: 150px;" scope="row">{{formulaire_cotization.aptNum}}</th>
+        <th class="text-wrap" style="max-width: 150px;" scope="row">{{formulaire_cotization.montant}}</th>
+        <th class="text-wrap" style="max-width: 150px;" scope="row">{{formulaire_cotization.regle}}</th>
+        <th class="text-wrap" style="max-width: 150px;" scope="row">{{formulaire_cotization.motif_mois}}</th>
+        <th class="text-wrap" style="max-width: 150px;" scope="row">{{formulaire_cotization.motif_annee}}</th>
+        <th class="text-wrap" style="max-width: 150px;" scope="row">{{formulaire_cotization.frais_sindic}}</th>
+        <th class="text-wrap" style="max-width: 150px;" scope="row">{{formulaire_cotization.frais_sindic_manual}}</th>
+        <!--
+        <td style="text-align: center;">
+            {% if formulaire_charge.image_charge %} 
+           
+            <img src="{{formulaire_charge.image_charge.url}}" width="20%" alt="" />
+            {% endif %}
+        </td>
+        -->
+        {% if user.is_superuser %}
+        <td style="text-align: center;">
+          
+          <a class="btn btn-primary" href="{% url 'formulaire_cotization_pdf' formulaire_cotization.id %}">Imprimer PDF {{formulaire_cotization.id}}</a>
+          
+        </td>
+        {% endif %}
+              
+        {% if user.is_superuser %}
+        <td style="text-align: center;">
+          
+          <a class="btn btn-success" href="{% url 'actualiser_formulaire_cotization' formulaire_cotization.id %}">Actualiser {{formulaire_cotization.id}}</a>
+          
+        </td>
+        {% endif %}
+       
+        {% if user.is_superuser %}
+        <td style="text-align: center;">
+          
+          <a class="btn btn-danger" href="#" onclick="confirmFormulaireCotizationDelete('{{ formulaire_cotization.id }}')">Eliminer {{formulaire_cotization.id}}</a>
+          
+      </td>
+      {% endif %}
+      </tr>
+      {% endfor %}
+      
+    </tbody>
+    <tfoot>
+      <tr>
+          <th colspan="3" class="text-right">Total Montant para utilisateur</th>
+          <th class="text-wrap" style="max-width: 150px; color:blue;" scope="row">
+            {% for montant_usuario in montant_por_usuario %}
+                {{ montant_usuario.nom }}
+            {% endfor %}
+          </th>
+          <th class="text-wrap" style="max-width: 150px; color:red;" scope="row">
+            {% for montant_usuario in montant_por_usuario %}
+                {{montant_usuario.prenom}}
+            {% endfor %}
+          </th>
+          <th class="text-wrap" style="max-width: 150px;" scope="row">
+              {% for montant_usuario in montant_por_usuario %}
+                  {{ montant_usuario.total_montant|floatformat:2 }}
+              {% endfor %}
+          </th>
+          <th colspan="{% if user.is_superuser %}8{% else %}2{% endif %}"></th>
+      </tr>
+      <tr>
+          <th colspan="5" class="text-right">Total Montant</th>
+          <th class="text-wrap" style="max-width: 150px;" scope="row">{{ total_montant|floatformat:2 }}</th>
+          <th colspan="{% if user.is_superuser %}8{% else %}2{% endif %}"></th>
+         
+      </tr>
+  </tfoot>
+    
+  </table> 
+  <br /><br />
+  <br />
+  {% if tous_les_formulaire_cotization.has_previous %}
+  <a class="btn btn-primary" href="?page=1">&laquo; First</a>
+  <a
+    class="btn btn-success"
+    href="?page={{ tous_les_formulaire_cotization.previous_page_number }}"
+    >Previous</a
+  >
+  {% endif %}
+
+  <div class="btn btn-light">
+    Page {{ tous_les_formulaire_cotization.number }} of {{ tous_les_formulaire_cotization.paginator.num_pages }}
+  </div>
+  {% if tous_les_formulaire_cotization.has_next %}
+  <a
+    class="btn btn-danger"
+    href="?page={{tous_les_formulaire_cotization.next_page_number}}"
+    >Next</a
+  >
+  <a
+    class="btn btn-warning"
+    href="?page={{ tous_les_formulaire_cotization.paginator.num_pages }}"
+    >Last &raquo;</a
+  >
+  {% endif %}
+  <br /><br />
+
+  <nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+      {% if tous_les_formulaire_cotization.has_previous %}
+      <li class="page-item m-1">
+        <a class="btn btn-primary page-link" href="?page=1">&laquo; First</a>
+      </li>
+      <li class="page-item m-1">
+        <a
+          class="btn btn-success page-link"
+          href="?page={{ tous_les_formulaire_cotization.previous_page_number }}"
+          >Previous</a
+        >
+      </li>
+
+      {% endif %}
+
+      <li class="page-item m-1 page-link">
+        Page {{ tous_les_formulaire_cotization.number }} of {{ tous_les_formulaire_cotization.paginator.num_pages }}
+      </li>
+
+      {% for i in nums %}
+      <li class="page-item m-1">
+        <a class="btn btn-danger page-link" href="?page={{forloop.counter }}"
+          >{{ forloop.counter }}</a
+        >
+      </li>
+      {% endfor %} {% if tous_les_formulaire_cotization.has_next %}
+
+      <li class="page-item m-1">
+        <a
+          class="btn btn-danger page-link"
+          href="?page={{tous_les_formulaire_cotization.next_page_number}}"
+          >Next</a
+        >
+      </li>
+      <li class="page-item m-1">
+        <a
+          class="btn btn-warning page-link"
+          href="?page={{ tous_les_formulaire_cotization.paginator.num_pages }}"
+          >Last &raquo;</a
+        >
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
+
+  <br />
+
+
+
+{% endblock %}
+
+
+  

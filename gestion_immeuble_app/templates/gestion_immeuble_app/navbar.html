@@ -1,0 +1,132 @@
+<nav class="navbar navbar-expand-lg bg-warning" data-bs-theme="dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="{% url 'home' %}">Gestion Immeuble</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          
+          <li class="nav-item" hidden>
+            <a class="nav-link active shadow rounded" href="{% url 'home' %}"
+              >Calendrier</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active shadow rounded" href="{% url 'liste_situation_caisse' %}"
+              >Situation Caisse</a
+            >
+          </li>
+          {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link active" href="{% url 'liste_formulaire_p_concierge' %}">Liste P Concierge</a>
+          </li>
+          {% endif %}
+          {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link active" href="{% url 'liste_des_charges' %}">Liste des charges de l'immeuble</a>
+          </li>
+          {% endif %}
+          {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link active" href="{% url 'liste_des_formulaire_charges' %}">Liste Formulaire charges de l'immeuble</a>
+          </li>
+          {% endif %}
+          {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link active" href="{% url 'liste_des_formulaire_liste_proprietaires' %}">Liste Formulaire Liste des proprietaires</a>
+          </li>
+          {% endif %}
+          {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link active" href="{% url 'liste_formulaire_cotization' %}">Liste Formulaire Cotization</a>
+          </li>
+          {% endif %}
+          {% if user.is_superuser %}
+          <li class="nav-item">
+            <a class="nav-link active shadow rounded" href="{% url 'enregistrer_formulaire_p_concierge' %}">Enregister un P Concierge</a>
+          </li>
+          {% endif %}
+          {% if user.is_superuser %}
+          <li class="nav-item">
+            <a class="nav-link active shadow rounded" href="{% url 'enregistrer_charge' %}">Enregister une charge</a>
+          </li>
+          {% endif %}
+          {% if user.is_superuser %}
+          <li class="nav-item">
+            <a class="nav-link active shadow rounded" href="{% url 'enregistrer_formulaire_charge' %}">Enregister Formulaire charge</a>
+          </li>
+          {% endif %} 
+          {% if user.is_superuser %}
+          <li class="nav-item">
+            <a class="nav-link active shadow rounded" href="{% url 'enregistrer_formulaire_liste_proprietaire' %}">Enregister Formulaire Liste de Proprietaires</a>
+          </li>
+          {% endif %}
+          {% if user.is_superuser %}
+          <li class="nav-item">
+            <a class="nav-link active shadow rounded" href="{% url 'enregistrer_formulaire_cotization' %}">Enregister Formulaire Cotization</a>
+          </li>
+          {% endif %}             
+          {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link active" href="{% url 'logout'  %}">Logout</a>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-link active" href="{% url 'register_user'  %}"
+              >Register</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="{% url 'login'  %}">Login</a>
+          </li>
+          {% endif %}
+           
+          <li class="nav-item dropdown" hidden>
+            <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              id="navbarDropdown"
+              role="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              Download
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="#">Action</a></li>
+              <li><a class="dropdown-item" href="#">Another action</a></li>
+              <li><hr class="dropdown-divider" /></li>
+              <li><a class="dropdown-item" href="#">Something else here</a></li>
+            </ul>
+          </li>
+          <li class="nav-item" hidden>
+            <a class="nav-link" href="#" tabindex="-1" aria-disabled="true"
+              >Otros</a
+            >
+          </li>
+        </ul>
+        <form class="d-flex" method="POST" action="">
+          {% csrf_token %}
+          <input
+            class="form-control me-2"
+            type="search"
+            placeholder="Search"
+            aria-label="Search"
+            name="searched"
+            hidden
+          />
+          <button class="btn btn-outline-success" type="submit" hidden>Search</button>
+        </form>
+      </div>
+    </div>
+  </nav>
+  

@@ -1,0 +1,43 @@
+{% extends 'gestion_immeuble_app/base.html' %} 
+
+
+{% block content %}
+  <div class="row">
+    <div class="col col-8"><h1>la liste Situation Caisse</h1></div>
+    <div class="col col-4"><h2 class="btn-primary text-center rounded text-warning">Utilizateur connecté(e): 
+      {% if user.is_authenticated %}
+      {{name}}
+      {% else %}
+      Tu n´est pas connécté(e)
+      {% endif %}
+    </h2></div>
+  </div>
+  
+  <!-- antes venue_list-->
+
+  <table class="table table-striped table-hover table-bordered border-primary shadow rounded custom-table">
+    <thead>
+      <tr>
+        <th scope="col" class="text-center">Montant Charge</th>
+        <th class="text-wrap text-center" style="max-width: 150px;" scope="row">{{total_montant_charge|floatformat:2}}</th>
+      </tr>
+      <tr>
+        <th scope="col" class="text-center">Montant Cotization</th>
+        <th class="text-wrap text-center" style="max-width: 150px;" scope="row">{{total_montant_cotizacion|floatformat:2}}</th>
+      </tr>
+      <tr>
+        <th scope="col" class="text-center">Total ( Cotization - Charge ) </th>
+        <th class="text-wrap text-center" style="max-width: 150px;" scope="row">{{total|floatformat:2}}</th>
+      </tr>
+    </thead>
+    
+  </table> 
+  <br /><br />
+
+
+
+
+{% endblock %}
+
+
+  

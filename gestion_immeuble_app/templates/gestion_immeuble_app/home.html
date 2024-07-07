@@ -1,0 +1,24 @@
+{% extends 'gestion_immeuble_app/base.html' %}
+
+{% block content %}
+<center>
+    <h1>{{name}}</h1>
+    <!--<h2>{{year}} </h2>
+    <h2>{{month_number}}</h2>-->
+    <h2>{{cal|safe}}</h2>
+    <h2> {{day}} </h2>
+   
+    <h2>Event this month .....</h2>
+    
+  
+  <div class="card-footer text-muted">
+    
+    <a href="" class="btn btn-success">Update Event</a>
+    <a href="" class="btn btn-danger">Delete Event</a>
+      
+    
+  </div>
+  
+  
+  </center>
+{% endblock %}
