@@ -458,6 +458,9 @@ def liste_situation_caisse(request):
     if total_montant_cotizacion is None  :
         total_montant_cotizacion = 0
     
+    if total_montant_charge is None  :
+        total_montant_charge = 0
+    
     #total =  total_montant_cotizacion - total_montant_charge   
     # Calculating total only if both values are not None
     if total_montant_cotizacion is not None and total_montant_charge is not None :
