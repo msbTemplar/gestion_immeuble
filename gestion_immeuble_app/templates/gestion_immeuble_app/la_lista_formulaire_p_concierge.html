@@ -42,7 +42,7 @@
     <tbody>
       {% for formulaire_p_concierge in la_lista_formulaire_p_concierge %}
       <tr>
-        <th class="text-wrap" style="max-width: 150px;" scope="row">{{formulaire_p_concierge.date}}</th>
+        <th class="text-wrap" style="max-width: 150px;" scope="row">{{formulaire_p_concierge.date|date:"Y-m-d"}}</th>
         
         <th class="text-wrap" style="max-width: 150px;" scope="row">{{formulaire_p_concierge.nom}}</th>
         <th class="text-wrap" style="max-width: 150px;" scope="row">{{formulaire_p_concierge.prenom}}</th>

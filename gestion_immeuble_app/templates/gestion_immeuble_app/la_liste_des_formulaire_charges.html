@@ -20,8 +20,8 @@
       <tr>
         <th scope="col" class="text-center">Date</th>
         <th scope="col" class="text-center">Nom Charge</th>
-        <th scope="col" class="text-center">Au</th>
         <th scope="col" class="text-center">Du</th>
+        <th scope="col" class="text-center">Au</th>
         <th scope="col" class="text-center">Montant</th>
         <th scope="col" class="text-center">Image Charge</th>
        
@@ -36,10 +36,10 @@
     <tbody>
       {% for formulaire_charge in la_lista_des_formulaire_charges %}
       <tr>
-        <th class="text-wrap" style="max-width: 150px;" scope="row">{{formulaire_charge.date}}</th>
+        <th class="text-wrap" style="max-width: 150px;" scope="row">{{formulaire_charge.date|date:"Y-m-d"}}</th>
         <th class="text-wrap" style="max-width: 150px;" scope="row">{{formulaire_charge.charge}}</th>
-        <th class="text-wrap" style="max-width: 150px;" scope="row">{{formulaire_charge.du}}</th>
-        <th class="text-wrap" style="max-width: 150px;" scope="row">{{formulaire_charge.au}}</th>
+        <th class="text-wrap" style="max-width: 150px;" scope="row">{{formulaire_charge.du|date:"Y-m-d"}}</th>
+        <th class="text-wrap" style="max-width: 150px;" scope="row">{{formulaire_charge.au|date:"Y-m-d"}}</th>
         <th class="text-wrap" style="max-width: 150px;" scope="row">{{formulaire_charge.montant}}</th>
         <!--
         <td style="text-align: center;">
