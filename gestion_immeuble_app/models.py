@@ -8,17 +8,29 @@ class Charge(models.Model):
         def __str__(self) -> str:
             return self.nome_charge
 
+def validate_file_extension(value):
+    import os
+    from django.core.exceptions import ValidationError
+    ext = os.path.splitext(value.name)[1]  # Obtener la extensión del archivo
+    valid_extensions = ['.pdf', '.xls', '.xlsx', '.doc', '.docx']  # Extensiones permitidas
+    if not ext.lower() in valid_extensions:
+        raise ValidationError('Tipo de archivo no soportado. Sube archivos PDF, XLS, XLSX, DOC o DOCX.')  
+
 class FormulaireCharge(models.Model):
     date=models.DateTimeField('Date')
     charge=models.ForeignKey(Charge, blank=True, null=True, on_delete=models.CASCADE)
     du=models.DateField('Du')
     au=models.DateField('Au')
     montant = models.DecimalField('Montant', max_digits=10, decimal_places=2)  # Agregar max_digits y decimal_places
-    image_charge = models.ImageField(null=True, blank=True, upload_to="images/")
+    #image_charge = models.ImageField(null=True, blank=True, upload_to="images/")
+    image_charge = models.FileField('Fichier de charge', null=True, blank=True, upload_to="uploads/",
+                                    validators=[validate_file_extension])
     
     def __str__(self) -> str:  # Agregar un método __str__ para esta clase también
         return f"FormulaireCharge Charge {self.charge} du {self.du} au {self.au} avec le montant {self.montant} "
     
+
+  
 
 class FormulaireListeDesProprietaires(models.Model):
     proprietaire_locataire_choices = [

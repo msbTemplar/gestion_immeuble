@@ -1,5 +1,5 @@
 {% extends 'gestion_immeuble_app/base.html' %} 
-
+{% load static %}
 
 {% block content %}
   <div class="row">
@@ -49,6 +49,7 @@
             {% endif %}
         </td>
         -->
+        <!--
         <td style="text-align: center;">
           {% if formulaire_charge.image_charge %}
               <a href="{{ formulaire_charge.image_charge.url }}" target="_blank">
@@ -56,6 +57,18 @@
               </a>
           {% endif %}
       </td>
+      -->
+      <td style="text-align: center;">
+        {% if formulaire_charge.image_charge %}
+          <a href="{{ formulaire_charge.image_charge.url }}" target="_blank">
+            
+              <img src="{{ formulaire_charge.image_charge.url }}" width="20%" alt="{{ formulaire_charge.image_charge.name }}" />
+           
+          </a>
+        {% endif %}
+      </td>
+      
+      
       
         {% if user.is_superuser %}
         <td style="text-align: center;">
