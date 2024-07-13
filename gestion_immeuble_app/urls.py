@@ -55,6 +55,7 @@ urlpatterns = [
     path('formulaire_p_concierge_pdf/<int:id_formulaire_p_concierge>/', views.formulaire_p_concierge_pdf, name='formulaire_p_concierge_pdf'),
     path('generate_p_concierge_temp_pdf/', views.generate_p_concierge_temp_pdf, name='generate_p_concierge_temp_pdf'),
     path('serve_p_concierge_temp_pdf/<str:filename>/', views.serve_p_concierge_temp_pdf, name='serve_p_concierge_temp_pdf'),
+    path('backup/', views.backup_database, name='backup_database'),
 
 
 

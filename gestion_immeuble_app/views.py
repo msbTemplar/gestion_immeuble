@@ -21,6 +21,14 @@ from django.http import FileResponse
 from django.urls import reverse
 import os
 import tempfile
+import csv
+from django.http import HttpResponse
+from excel_response import ExcelResponse  # Importa la respuesta Excel
+import openpyxl
+from openpyxl.writer.excel import save_virtual_workbook
+from datetime import date
+from openpyxl.styles import Font
+from django.core import management
 
 #import datetime
 # Create your views here.
@@ -184,6 +192,50 @@ def liste_des_formulaire_charges(request):
     print("hola : " + str(tous_les_formulaire_charges.paginator.num_pages))
     
     context = {'la_lista_des_formulaire_charges': la_lista_des_formulaire_charges, 'tous_les_formulaire_charges': tous_les_formulaire_charges, 'nums': nums, 'name':name, 'total_montant':total_montant}
+    
+    if request.GET.get('export') == 'excel':
+        # Crear un libro de trabajo y una hoja
+        today = datetime.today()
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Formulaire Concierge"
+        
+        # Crear una nueva hoja para la tabla
+        #ws2 = wb.create_sheet(title="Formulaire Concierge")
+
+        # Agregar los encabezados de la tabla
+        headers = ['Date', 'Charge', 'Du', 'Au', 'Montant', 'Nom Fichier']
+        #if request.user.is_superuser:
+            #headers.extend(['Imprimer pdf', 'Actualiser', 'Eliminer'])
+        ws.append(headers)
+
+        # Aplicar negrita a los encabezados
+        for cell in ws[1]:
+            cell.font = Font(bold=True)
+
+        # Agregar los datos de la tabla
+        for item in la_lista_des_formulaire_charges:
+            row = [
+                item.date.strftime('%Y-%m-%d'),
+                item.charge.nome_charge,
+                item.du,
+                item.au,
+                item.montant,
+                item.image_charge.name
+            ]
+            #if request.user.is_superuser:
+                #row.extend(['Imprimer', 'Actualiser', 'Eliminer'])
+            ws.append(row)
+            
+        ws.append(['Total Montant', '', '','', total_montant])
+        
+        # Crear una respuesta HTTP con el archivo Excel
+        filename = f"liste_charges_immeuble_{today.strftime('%Y%m%d_%H%M%S')}.xlsx"
+        response = HttpResponse(save_virtual_workbook(wb), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        #response['Content-Disposition'] = 'attachment; filename=lista_paie_concierge.xlsx'
+        response['Content-Disposition'] = f'attachment; filename={filename}'
+        
+        return response
     return render(request, 'gestion_immeuble_app/la_liste_des_formulaire_charges.html', context)
 
 
@@ -360,6 +412,129 @@ def liste_formulaire_cotization(request):
     print("hola : " + str(tous_les_formulaire_cotization.paginator.num_pages))
     
     context = {'la_lista_formulaire_cotization': la_lista_formulaire_cotization, 'tous_les_formulaire_cotization': tous_les_formulaire_cotization, 'nums': nums, 'name':name, 'total_montant': total_montant,'montant_por_usuario': montant_por_usuario_list,}
+    
+    if request.GET.get('export') == 'excel':
+        # Crear un libro de trabajo y una hoja
+        today = datetime.today()
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Formulaire cotisation"
+        
+        # Crear una nueva hoja para la tabla
+        #ws2 = wb.create_sheet(title="Formulaire Concierge")
+
+        # Agregar los encabezados de la tabla
+        headers = ['Nº Ordre', 'Date', 'Nom', 'Prenom', 'Nº Apt', 'Montant','Reglé?','Mois', 'Année' , 'Frais Sindic', 'Frais Sindic Manual']
+        #if request.user.is_superuser:
+            #headers.extend(['Imprimer pdf', 'Actualiser', 'Eliminer'])
+        ws.append(headers)
+
+        # Aplicar negrita a los encabezados
+        for cell in ws[1]:
+            cell.font = Font(bold=True)
+
+        # Agregar los datos de la tabla
+        for item in la_lista_formulaire_cotization:
+            row = [
+                item.codeFormCotiz,
+                item.date.strftime('%Y-%m-%d'),
+                item.nom,
+                item.prenom,
+                item.aptNum,
+                item.montant,
+                item.regle,
+                item.motif_mois,
+                item.motif_annee,
+                item.frais_sindic,
+                item.frais_sindic_manual
+            ]
+            #if request.user.is_superuser:
+                #row.extend(['Imprimer', 'Actualiser', 'Eliminer'])
+            ws.append(row)
+        
+        # Agregar los datos agrupados por usuario
+        for montant in montant_por_usuario_list:
+            row = [
+                'Total Montant par Proprietaire/Locataire',
+                montant['nom'],
+                montant['prenom'],
+                montant['total_montant']
+            ]
+            ws.append(row)
+        ws.append(['Total Montant', '', '', total_montant])
+        
+        # Crear una respuesta HTTP con el archivo Excel
+        filename = f"liste_des_cotisations_{today.strftime('%Y%m%d_%H%M%S')}.xlsx"
+        response = HttpResponse(save_virtual_workbook(wb), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        #response['Content-Disposition'] = 'attachment; filename=lista_paie_concierge.xlsx'
+        response['Content-Disposition'] = f'attachment; filename={filename}'
+        
+        return response
+    
+    # Agrupar montants por usuario (nom, prenom)
+    montant_por_usuario1 = {}
+    for formulaire_cotization in la_lista_formulaire_cotization:
+        key = (formulaire_cotization.nom, formulaire_cotization.prenom)
+        if key in montant_por_usuario1:
+            montant_por_usuario1[key].append(formulaire_cotization)
+        else:
+            montant_por_usuario1[key] = [formulaire_cotization]
+    
+    # Convertir el diccionario en una lista de diccionarios para usar en la plantilla
+    montant_por_usuario_list1 = [{'nom': key[0], 'prenom': key[1], 'total_montant1': sum(fc.montant for fc in value)} for key, value in montant_por_usuario1.items()]
+
+    
+    # Si se solicita la exportación a Excel
+    if request.GET.get('export') == 'excel1':
+        nom = request.GET.get('nom')
+        prenom = request.GET.get('prenom')
+        
+        # Obtener los formulario_cotizations para el nom y prenom especificados
+        if nom and prenom:
+            key = (nom, prenom)
+            formulario_cotizations = montant_por_usuario1.get(key, [])
+            
+            total_montant_usuario = sum(fc.montant for fc in formulario_cotizations)
+            
+            # Crear un libro de trabajo y una hoja
+            wb = openpyxl.Workbook()
+            ws = wb.active
+            ws.title = f"Form cot_{nom}_{prenom}"
+            
+            # Agregar los encabezados de la tabla
+            headers = ['Nº Ordre', 'Date', 'Nom', 'Prenom', 'Nº Apt', 'Montant', 'Reglé?', 'Mois', 'Année', 'Frais Sindic', 'Frais Sindic Manual']
+            ws.append(headers)
+            
+            # Aplicar negrita a los encabezados
+            for cell in ws[1]:
+                cell.font = Font(bold=True)
+            
+            # Agregar los datos para el nom y prenom especificados
+            for formulaire_cotization in formulario_cotizations:
+                row = [
+                    formulaire_cotization.codeFormCotiz,
+                    formulaire_cotization.date.strftime('%Y-%m-%d'),
+                    formulaire_cotization.nom,
+                    formulaire_cotization.prenom,
+                    formulaire_cotization.aptNum,
+                    formulaire_cotization.montant,
+                    formulaire_cotization.regle,
+                    formulaire_cotization.motif_mois,
+                    formulaire_cotization.motif_annee,
+                    formulaire_cotization.frais_sindic,
+                    formulaire_cotization.frais_sindic_manual
+                ]
+                ws.append(row)
+            ws.append(['Total Montant', '', '','','', total_montant_usuario])
+            
+            # Crear una respuesta HTTP con el archivo Excel para descarga
+            filename = f"liste_des_cotisations_{nom}_{prenom}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+            response = HttpResponse(save_virtual_workbook(wb), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+            
+            return response
+    
+    
     return render(request, 'gestion_immeuble_app/la_lista_formulaire_cotization.html', context)
 
 def get_proprietaire_data(request, pk):
@@ -469,7 +644,37 @@ def liste_situation_caisse(request):
         total = 0  # Default to 0 if either value is None
     name = request.user.username
     
+    
+    
     context = {'la_lista_formulaire_cotization': la_lista_formulaire_cotization, 'la_lista_des_formulaire_charges': la_lista_des_formulaire_charges, 'name':name, 'total_montant_cotizacion': total_montant_cotizacion,'total_montant_charge': total_montant_charge, 'total' : total,}
+    
+    if request.GET.get('export') == 'excel':
+        # Crear un libro de trabajo y una hoja
+        today = date.today()
+        
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Situation Caisse"
+        
+        ws.append(['Date', today.strftime('%Y-%m-%d')])
+        # Agregar los datos a la hoja
+        ws.append(['Montant Charge', total_montant_charge, " dh"])
+        ws.append(['Montant Cotisation', total_montant_cotizacion , " dh"])
+        ws.append(['Total ( Cotisation - Charge )', total , " dh"])
+        
+        # Aplicar negrita a la celda "Date"
+        cell = ws['B1']
+        cell.font = Font(bold=True)
+        
+        # Aplicar negrita a toda la columna A
+        for cell in ws['A']:
+            cell.font = Font(bold=True)
+        
+        # Crear una respuesta HTTP con el archivo Excel
+        response = HttpResponse(save_virtual_workbook(wb), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename=situation_caisse.xlsx'
+        return response
+    
     return render(request, 'gestion_immeuble_app/la_lista_situation_caisse.html', context)
 
 def liste_formulaire_p_concierge(request):
@@ -487,9 +692,104 @@ def liste_formulaire_p_concierge(request):
     print("hola : " + str(tous_les_formulaire_p_concierge.paginator.num_pages))
     
     context = {'la_lista_formulaire_p_concierge': la_lista_formulaire_p_concierge, 'tous_les_formulaire_p_concierge': tous_les_formulaire_p_concierge, 'nums': nums, 'name':name,}
+    
+    if request.GET.get('export') == 'excel':
+        # Crear un libro de trabajo y una hoja
+        today = datetime.today()
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Formulaire Concierge"
+        
+        # Crear una nueva hoja para la tabla
+        #ws2 = wb.create_sheet(title="Formulaire Concierge")
+
+        # Agregar los encabezados de la tabla
+        headers = ['Date', 'Nom', 'Prenom', 'Montant', 'Mois', 'Année']
+        #if request.user.is_superuser:
+            #headers.extend(['Imprimer pdf', 'Actualiser', 'Eliminer'])
+        ws.append(headers)
+
+        # Aplicar negrita a los encabezados
+        for cell in ws[1]:
+            cell.font = Font(bold=True)
+
+        # Agregar los datos de la tabla
+        for item in la_lista_formulaire_p_concierge:
+            row = [
+                item.date.strftime('%Y-%m-%d'),
+                item.nom,
+                item.prenom,
+                item.montant,
+                item.mois,
+                item.annee
+            ]
+            #if request.user.is_superuser:
+                #row.extend(['Imprimer', 'Actualiser', 'Eliminer'])
+            ws.append(row)
+        
+        # Crear una respuesta HTTP con el archivo Excel
+        filename = f"lista_paie_concierge_{today.strftime('%Y%m%d_%H%M%S')}.xlsx"
+        response = HttpResponse(save_virtual_workbook(wb), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        #response['Content-Disposition'] = 'attachment; filename=lista_paie_concierge.xlsx'
+        response['Content-Disposition'] = f'attachment; filename={filename}'
+        
+        return response
+    
     return render(request, 'gestion_immeuble_app/la_lista_formulaire_p_concierge.html', context)
 
+
 def enregistrer_formulaire_p_concierge_view(request):
+    if request.method == 'POST':
+        form_p_concierge = EnregistrerFormulairePConciergeForm(request.POST, request.FILES)
+        if form_p_concierge.is_valid():
+            print("Formulario P Concierge válido")
+            instance_p_concierge = form_p_concierge.save(commit=False)  # Guardar el formulario sin commit para poder modificar datos antes de guardarlo completamente
+            nom = instance_p_concierge.nom
+            prenom = instance_p_concierge.prenom
+            date = instance_p_concierge.date
+            montant = instance_p_concierge.montant
+            mois = instance_p_concierge.mois
+            annee = instance_p_concierge.annee
+            charge_id = form_p_concierge.cleaned_data.get('charge_id')  # Ejemplo de cómo obtener charge_id
+            
+            # Crear instancia del otro formulario y guardarla
+            form_charge = EnregistrerFormulaireChargeForm({
+                'charge': charge_id,  # Ejemplo de cómo podrías asignar valores al formulario de carga
+                'du': date,  # Ejemplo, ajusta según tus campos
+                'au': date,  # Ejemplo, ajusta según tus campos
+                'date': date,  # Ejemplo, ajusta según tus campos
+                'montant': montant,  # Ejemplo, ajusta según tus campos
+                'image_charge': None  # Ajusta o elimina dependiendo de tus necesidades
+            })
+            if form_charge.is_valid():
+                print("Formulario Charge válido")
+                instance_charge = form_charge.save()  # Guardar el formulario de carga
+
+                # Envío de correo electrónico
+                email_message = EmailMessage(
+                    subject=f'Contact Form: {nom} - {prenom} - {montant}',
+                    body=f'Nom : {nom}\nPrenom: {prenom}\nDate: {date}\nMotif mois: {mois}\nMotif année: {annee}',
+                    from_email=settings.EMAIL_HOST_USER,
+                    to=['msb.duck@gmail.com', 'msb.tesla@gmail.com', 'msebti2@gmail.com', 'msb.acer@gmail.com'],
+                    reply_to=['msebti2@gmail.com']
+                )
+                email_message.send(fail_silently=False)
+
+                form_p_concierge.save()  # Guardar el formulario original también si es necesario
+                return redirect('liste_formulaire_p_concierge')  # Redirigir después de guardar
+            else:
+                print("Errores en el formulario Charge:", form_charge.errors)
+                # Manejo de errores si el formulario de carga no es válido
+                # Puedes retornar errores o realizar otras acciones aquí
+                pass
+    else:
+        print("Errores en el formulario P Concierge:")
+        form_p_concierge = EnregistrerFormulairePConciergeForm()
+
+    return render(request, 'enregistrer_formulaire_p_concierge.html', {'form': form_p_concierge})
+
+
+def enregistrer_formulaire_p_concierge_view2(request):
     if request.method == 'POST':
         form = EnregistrerFormulairePConciergeForm(request.POST, request.FILES)
         if form.is_valid():
@@ -529,7 +829,7 @@ def enregistrer_formulaire_p_concierge_view(request):
             
             # Adjuntar el archivo
             #email_message.attach(file.name, file.read(), file.content_type)
-
+            
             # Enviar el email
             email_message.send(fail_silently=False)
             form.save()
@@ -890,3 +1190,69 @@ def generate_p_concierge_temp_pdf(request):
 def serve_p_concierge_temp_pdf(request, filename):
     filepath = os.path.join(tempfile.gettempdir(), filename)
     return FileResponse(open(filepath, 'rb'), content_type='application/pdf')
+
+
+def backup_database(request):
+    try:
+         # Obtener la fecha y hora actual
+        now = datetime.now()
+        
+        # Formatear la fecha y hora como parte del nombre del archivo
+        timestamp = now.strftime('%Y-%m-%d_%H-%M-%S')
+        
+        # Define la ruta donde se almacenará la copia de seguridad dentro del proyecto
+        backup_dir = os.path.join(settings.BASE_DIR, 'backups')
+        if not os.path.exists(backup_dir):
+            os.makedirs(backup_dir)
+        
+        # Nombre del archivo de copia de seguridad
+        #backup_file_name = 'backup.json'
+        backup_file_name = f'backup_{timestamp}.json'
+        
+        # Ruta completa del archivo de copia de seguridad
+        backup_file_path = os.path.join(backup_dir, backup_file_name)
+        
+        # Genera la copia de seguridad
+        #management.call_command('dumpdata', stdout=open(backup_file_path, 'w'))
+        management.call_command('dumpdata', format='json', indent=2, output=backup_file_path)
+        
+        
+        # Enviar el archivo por correo electrónico
+        subject = 'Copia de seguridad de base de datos'
+        message = 'Adjunto encontrarás la copia de seguridad de la base de datos.'
+        email_message = EmailMessage(
+                subject=f'Contact Form: {subject}',
+                #body=titulo_serie + " " + serie_o_pelicula + " " +  plataforma,
+                body=f'{message}',
+                
+                from_email=settings.EMAIL_HOST_USER,
+                to=['msb.duck@gmail.com', 'msb.tesla@gmail.com', 'msebti2@gmail.com', 'msb.acer@gmail.com'],
+                reply_to=['msebti2@gmail.com']
+            )
+            # Adjuntar cada archivo
+            #for file in files:
+                #email_message.attach(file.name, file.read(), file.content_type)
+            
+            #if image_charge:
+                #mime_type, _ = mimetypes.guess_type(image_charge.path)
+                #email_message.attach(image_charge.name, image_charge.read(), mime_type)
+            
+            # Adjuntar el archivo
+            #email_message.attach(file.name, file.read(), file.content_type)
+            
+            # Enviar el email
+       
+        
+        # Adjuntar el archivo de copia de seguridad al correo
+        email_message.attach_file(backup_file_path)
+        
+        #email_message.send(fail_silently=False)
+        # Enviar el correo electrónico
+        email_message.send()
+        
+        #return HttpResponse("Copia de seguridad enviada por correo electrónico correctamente.")
+        return redirect('home')
+    
+    
+    except Exception as e:
+        return HttpResponse(f"Error al crear o enviar la copia de seguridad: {str(e)}")

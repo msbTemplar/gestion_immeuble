@@ -30,7 +30,16 @@
         <th class="text-wrap text-center" style="max-width: 150px;" scope="row">{{total|floatformat:2}}</th>
       </tr>
     </thead>
-    
+    <tbody>
+      {% if user.is_superuser %}
+      <tr>
+        <td colspan="2" class="text-center">
+          <!-- Agrega el botón para exportar a Excel -->
+    <a href="?export=excel" class="btn btn-success">Exportar a Excel</a>
+        </td>
+      </tr>
+      {% endif %}
+    </tbody>
   </table> 
   <br /><br />
 

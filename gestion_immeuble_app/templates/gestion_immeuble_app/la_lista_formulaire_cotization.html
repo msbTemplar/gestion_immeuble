@@ -108,6 +108,14 @@
                     <th colspan="2" class="text-wrap" style="max-width: 150px; color:red;">
                         {{ montant_usuario.total_montant|floatformat:2 }}
                     </th>
+                    {% if user.is_superuser %}
+     
+                    <th colspan="14" class="text-center">
+                      <!-- Agrega el botón para exportar a Excel -->
+                      <a href="?export=excel1&nom={{ montant_usuario.nom }}&prenom={{ montant_usuario.prenom }}" class="btn btn-warning">Exportar a Excel</a>
+                    </th>
+      
+                    {% endif %}
                 </tr>
             {% endfor %}
         </th>
@@ -143,6 +151,15 @@
           <th colspan="{% if user.is_superuser %}8{% else %}2{% endif %}"></th>
          -->
       </tr>
+      {% if user.is_superuser %}
+      <tr>
+        <td colspan="14" class="text-center">
+          <!-- Agrega el botón para exportar a Excel -->
+    <a href="?export=excel" class="btn btn-success">Exportar a Excel</a>
+        </td>
+      </tr>
+      {% endif %}
+      
   </tfoot>
     
   </table> 

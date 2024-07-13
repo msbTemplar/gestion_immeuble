@@ -45,6 +45,10 @@ class EnregistrerFormulaireChargeForm(forms.ModelForm):
             'montant': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Montant', 'id': 'id_montant', 'min': '0', 'step': '0.01'}),
             'image_charge': forms.ClearableFileInput(attrs={'class': 'form-control', 'name': 'files', 'id': 'formFile'}),
         }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Obtener las opciones dinámicamente desde el modelo Charge
+        self.fields['charge'].queryset = Charge.objects.all()  # Puedes ajustar esto según tus necesidades de filtrado
 
 class EnregistrerFormulaireListeProprietaireForm(forms.ModelForm):
     class Meta:

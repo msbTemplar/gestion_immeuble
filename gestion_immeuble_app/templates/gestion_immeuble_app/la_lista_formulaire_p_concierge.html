@@ -85,7 +85,14 @@
       {% endif %}
       </tr>
       {% endfor %}
-      
+      {% if user.is_superuser %}
+      <tr>
+        <td colspan="9" class="text-center">
+          <!-- Agrega el botón para exportar a Excel -->
+    <a href="?export=excel" class="btn btn-success">Exportar a Excel</a>
+        </td>
+      </tr>
+      {% endif %}
     </tbody>
     
     

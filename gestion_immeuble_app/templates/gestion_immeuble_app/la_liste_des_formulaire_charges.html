@@ -95,6 +95,14 @@
           <th class="text-wrap" style="max-width: 150px;" scope="row">{{ total_montant|floatformat:2 }}</th>
           <th colspan="{% if user.is_superuser %}4{% else %}2{% endif %}"></th>
       </tr>
+      {% if user.is_superuser %}
+      <tr>
+        <td colspan="9" class="text-center">
+          <!-- Agrega el botón para exportar a Excel -->
+    <a href="?export=excel" class="btn btn-success">Exportar a Excel</a>
+        </td>
+      </tr>
+      {% endif %}
   </tfoot>
   </table> 
   <br /><br />

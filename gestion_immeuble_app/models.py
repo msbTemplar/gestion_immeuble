@@ -12,7 +12,7 @@ def validate_file_extension(value):
     import os
     from django.core.exceptions import ValidationError
     ext = os.path.splitext(value.name)[1]  # Obtener la extensión del archivo
-    valid_extensions = ['.pdf', '.xls', '.xlsx', '.doc', '.docx']  # Extensiones permitidas
+    valid_extensions = ['.pdf', '.xls', '.xlsx', '.doc', '.docx','.jpg','.png']  # Extensiones permitidas
     if not ext.lower() in valid_extensions:
         raise ValidationError('Tipo de archivo no soportado. Sube archivos PDF, XLS, XLSX, DOC o DOCX.')  
 
