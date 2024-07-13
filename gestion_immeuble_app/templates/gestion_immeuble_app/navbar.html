@@ -27,32 +27,32 @@
           </li>
           {% if user.is_authenticated %}
           <li class="nav-item">
-            <a class="nav-link active" href="{% url 'liste_formulaire_p_concierge' %}">Liste P Concierge</a>
-          </li>
-          {% endif %}
-          {% if user.is_authenticated %}
-          <li class="nav-item">
-            <a class="nav-link active" href="{% url 'liste_des_charges' %}">Liste des charges de l'immeuble</a>
-          </li>
-          {% endif %}
-          {% if user.is_authenticated %}
-          <li class="nav-item">
-            <a class="nav-link active" href="{% url 'liste_des_formulaire_charges' %}">Liste Formulaire charges de l'immeuble</a>
-          </li>
-          {% endif %}
-          {% if user.is_authenticated %}
-          <li class="nav-item">
-            <a class="nav-link active" href="{% url 'liste_des_formulaire_liste_proprietaires' %}">Liste Formulaire Liste des proprietaires</a>
-          </li>
-          {% endif %}
-          {% if user.is_authenticated %}
-          <li class="nav-item">
-            <a class="nav-link active" href="{% url 'liste_formulaire_cotization' %}">Liste Formulaire Cotization</a>
+            <a class="nav-link active" href="{% url 'liste_formulaire_p_concierge' %}">Liste Paie Concierge</a>
           </li>
           {% endif %}
           {% if user.is_superuser %}
           <li class="nav-item">
-            <a class="nav-link active shadow rounded" href="{% url 'enregistrer_formulaire_p_concierge' %}">Enregister un P Concierge</a>
+            <a class="nav-link active" href="{% url 'liste_des_charges' %}">Charges de l'immeuble</a>
+          </li>
+          {% endif %}
+          {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link active" href="{% url 'liste_des_formulaire_charges' %}">Liste charges de l'immeuble</a>
+          </li>
+          {% endif %}
+          {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link active" href="{% url 'liste_des_formulaire_liste_proprietaires' %}">Liste des proprietaires</a>
+          </li>
+          {% endif %}
+          {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link active" href="{% url 'liste_formulaire_cotization' %}">Liste des Cotisations</a>
+          </li>
+          {% endif %}
+          {% if user.is_superuser %}
+          <li class="nav-item">
+            <a class="nav-link active shadow rounded" href="{% url 'enregistrer_formulaire_p_concierge' %}">Formulaire  Paie Concierge</a>
           </li>
           {% endif %}
           {% if user.is_superuser %}
@@ -62,17 +62,17 @@
           {% endif %}
           {% if user.is_superuser %}
           <li class="nav-item">
-            <a class="nav-link active shadow rounded" href="{% url 'enregistrer_formulaire_charge' %}">Enregister Formulaire charge</a>
+            <a class="nav-link active shadow rounded" href="{% url 'enregistrer_formulaire_charge' %}">Formulaire charges de l'immeuble</a>
           </li>
           {% endif %} 
           {% if user.is_superuser %}
           <li class="nav-item">
-            <a class="nav-link active shadow rounded" href="{% url 'enregistrer_formulaire_liste_proprietaire' %}">Enregister Formulaire Liste de Proprietaires</a>
+            <a class="nav-link active shadow rounded" href="{% url 'enregistrer_formulaire_liste_proprietaire' %}"> Formulaire des Proprietaires</a>
           </li>
           {% endif %}
           {% if user.is_superuser %}
           <li class="nav-item">
-            <a class="nav-link active shadow rounded" href="{% url 'enregistrer_formulaire_cotization' %}">Enregister Formulaire Cotization</a>
+            <a class="nav-link active shadow rounded" href="{% url 'enregistrer_formulaire_cotization' %}">Formulaire des Cotisations</a>
           </li>
           {% endif %}             
           {% if user.is_authenticated %}

@@ -64,7 +64,7 @@ class EnregistrerFormulaireCotizationForm(forms.ModelForm):
         model = FormulaireCotization
         fields = '__all__'
         widgets = {
-           
+            'codeFormCotiz': forms.NumberInput(attrs={'class': 'form-control', 'id': 'id_codeFormCotiz', 'readonly':'readonly'}),
             'date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'liste_proprietaire': forms.Select(attrs={'class': 'form-control', 'id': 'id_liste_proprietaire'}),
             'nom': forms.TextInput(attrs={'class': 'form-control', 'id': 'id_nom'}),
@@ -79,6 +79,15 @@ class EnregistrerFormulaireCotizationForm(forms.ModelForm):
         
         
         }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Obtener el último valor de codeFormCotiz de la base de datos
+        last_code = FormulaireCotization.objects.order_by('-codeFormCotiz').first()
+        if last_code and last_code.codeFormCotiz is not None:
+            next_code = last_code.codeFormCotiz + 1
+        else:
+            next_code = 2205
+        self.fields['codeFormCotiz'].initial = next_code
 
 class EnregistrerFormulairePConciergeForm(forms.ModelForm):
     class Meta:

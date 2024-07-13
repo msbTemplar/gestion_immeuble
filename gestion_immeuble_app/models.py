@@ -64,9 +64,11 @@ class FormulaireCotization(models.Model):
         ('----', '----'),  # Opción vacía
         ('Frais Sindic', 'Frais Sindic')
     ]
-    
+    codeFormCotiz = models.IntegerField('Code', blank=True, null=True)
     date = models.DateTimeField('Date')
     liste_proprietaire = models.ForeignKey(FormulaireListeDesProprietaires, blank=True, null=True, on_delete=models.CASCADE)
+    
+    
     
     nom = models.CharField('Nom', max_length=120)
     prenom = models.CharField('Prenom', max_length=120)

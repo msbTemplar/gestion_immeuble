@@ -10,6 +10,25 @@
   
   {{ form.as_p }}
 
+  <script>
+    function generatePDF() {
+      var form = $('#registroForm');
+      $.ajax({
+          url: '/generate_p_concierge_temp_pdf/',  // Ruta que maneja la generación del PDF temporal
+          method: 'POST',
+          data: form.serialize(), // Enviar los datos del formulario
+          success: function(response) {
+              // Abrir el PDF en una nueva ventana
+              window.open(response.pdf_url, '_blank');
+          },
+          error: function(error) {
+              console.log('Error:', error);
+          }
+      });
+  }
+  </script>
+
+<input type="button" value="Imprimir PDF" class="btn btn-secondary" onclick="generatePDF()" />
 <input type="submit" value="Submit" class="btn btn-primary" />
 </form>
 

@@ -27,7 +27,9 @@
        
         <th scope="col" class="text-center">Mois</th>
         <th scope="col" class="text-center">Année</th>
-        
+        {% if user.is_superuser %}
+        <th scope="col" class="text-center">Imprimer pdf</th>
+        {% endif %}
        
         {% if user.is_superuser %}
         <th scope="col" class="text-center">Actualiser</th>
@@ -58,6 +60,13 @@
             {% endif %}
         </td>
         -->
+        {% if user.is_superuser %}
+        <td style="text-align: center;">
+          
+          <a class="btn btn-primary" href="{% url 'formulaire_p_concierge_pdf' formulaire_p_concierge.id %}">Imprimer PDF {{formulaire_p_concierge.id}}</a>
+          
+        </td>
+        {% endif %}
               
         {% if user.is_superuser %}
         <td style="text-align: center;">

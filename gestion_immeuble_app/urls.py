@@ -52,7 +52,9 @@ urlpatterns = [
     path('formulaire_cotization_pdf/<int:id_formulaire_cotization>/', views.formulaire_cotization_pdf, name='formulaire_cotization_pdf'),
     path('generate_temp_pdf/', views.generate_temp_pdf, name='generate_temp_pdf'),
     path('serve_temp_pdf/<str:filename>/', views.serve_temp_pdf, name='serve_temp_pdf'),
-
+    path('formulaire_p_concierge_pdf/<int:id_formulaire_p_concierge>/', views.formulaire_p_concierge_pdf, name='formulaire_p_concierge_pdf'),
+    path('generate_p_concierge_temp_pdf/', views.generate_p_concierge_temp_pdf, name='generate_p_concierge_temp_pdf'),
+    path('serve_p_concierge_temp_pdf/<str:filename>/', views.serve_p_concierge_temp_pdf, name='serve_p_concierge_temp_pdf'),
 
 
 

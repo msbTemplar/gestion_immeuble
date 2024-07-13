@@ -449,20 +449,23 @@ def get_last_id(request):
 
 def liste_situation_caisse(request):
     # venue_list = Venue.objects.all().order_by('?')
-    la_lista_formulaire_cotization = FormulaireCotization.objects.all()
+    #la_lista_formulaire_cotization = FormulaireCotization.objects.all()
+    la_lista_formulaire_cotization = FormulaireCotization.objects.filter(regle=True)
     total_montant_cotizacion = la_lista_formulaire_cotization.aggregate(total=Sum('montant'))['total']
     
     la_lista_des_formulaire_charges = FormulaireCharge.objects.all()
     total_montant_charge = la_lista_des_formulaire_charges.aggregate(total=Sum('montant'))['total']
+    if total_montant_cotizacion is None  :
+        total_montant_cotizacion = 0
     
     #total =  total_montant_cotizacion - total_montant_charge   
     # Calculating total only if both values are not None
-    if total_montant_cotizacion is not None and total_montant_charge is not None:
+    if total_montant_cotizacion is not None and total_montant_charge is not None :
         total = total_montant_cotizacion - total_montant_charge
     else:
         total = 0  # Default to 0 if either value is None
     name = request.user.username
-
+    
     context = {'la_lista_formulaire_cotization': la_lista_formulaire_cotization, 'la_lista_des_formulaire_charges': la_lista_des_formulaire_charges, 'name':name, 'total_montant_cotizacion': total_montant_cotizacion,'total_montant_charge': total_montant_charge, 'total' : total,}
     return render(request, 'gestion_immeuble_app/la_lista_situation_caisse.html', context)
 
@@ -670,11 +673,11 @@ def draw_content(c, formulaire_cotization, offset_y):
     c.setFont("Helvetica", 12)
     print("El formulaire_cotization.id : " + str(formulaire_cotization.id))
     # Ajustar las posiciones Y según el offset
-    if formulaire_cotization.id is not None:
-        new_id = formulaire_cotization.id + 2205
+    if formulaire_cotization.codeFormCotiz is not None:
+        new_id = formulaire_cotization.codeFormCotiz
         c.drawString(1 * inch, 6.5 * inch - offset_y, f"{str(new_id)}")
     else:
-        c.drawString(1 * inch, 6.5 * inch - offset_y, f"{ultimo_id + 1 + 2204}")
+        c.drawString(1 * inch, 6.5 * inch - offset_y, f"{str(ultimo_id)}")
     #c.drawString(1 * inch, 6.5 * inch - offset_y, f"{str(formulaire_cotization.id + 2205) } " )
     c.drawString(6 * inch, 6.5 * inch - offset_y, f"{formulaire_cotization.montant}")
     
@@ -715,7 +718,7 @@ def formulaire_cotization_pdf(request, id_formulaire_cotization):
     c.showPage()
     c.save()
     buf.seek(0)
-
+    
     return FileResponse(buf, as_attachment=True, filename=f'formulaire_cotization_{id_formulaire_cotization}.pdf')
 
 
@@ -755,5 +758,132 @@ def generate_temp_pdf(request):
     return JsonResponse({'error': 'Invalid data'}, status=400)
 
 def serve_temp_pdf(request, filename):
+    filepath = os.path.join(tempfile.gettempdir(), filename)
+    return FileResponse(open(filepath, 'rb'), content_type='application/pdf')
+
+
+def formulaire_p_concierge_pdf(request, id_formulaire_p_concierge):
+    # Crear buffer de flujo de bytes
+    buf = io.BytesIO()
+    # Crear canvas
+    c = canvas.Canvas(buf, pagesize=letter, bottomup=0)
+    
+    # Obtener el objeto por ID
+    formulaire_p_concierge = get_object_or_404(FormulairePConcierge, id=id_formulaire_p_concierge)
+    
+    # Dibujar el contenido en la parte superior
+    draw_content_p_concierge(c, formulaire_p_concierge, offset_y=1)
+    
+    # Dibujar línea separadora
+    c.line(0.5 * inch, 5 * inch, 7.5 * inch, 5 * inch)
+    
+    # Dibujar el contenido en la parte inferior
+    draw_content_p_concierge(c, formulaire_p_concierge, offset_y=6 * inch)
+    
+    c.showPage()
+    c.save()
+    buf.seek(0)
+    
+    return FileResponse(buf, as_attachment=True, filename=f'formulaire_p_concierge_{id_formulaire_p_concierge}.pdf')
+
+def draw_content_p_concierge2(c, formulaire_p_concierge, offset_y):
+    # Obtener el último objeto creado
+    ultimo_registro = FormulairePConcierge.objects.latest('id')
+
+# Acceder al ID del último registro
+    ultimo_id = ultimo_registro.id
+    c.setFont("Helvetica", 12)
+    print("El formulaire_p_concierge.id : " + str(formulaire_p_concierge.id))
+    
+    c.setFont("Helvetica-Bold", 14)
+    c.drawString(1 * inch, 6.5 * inch - offset_y, f"RABAT LE: {formulaire_p_concierge.date}")
+    
+    c.setFont("Helvetica", 12)
+    c.drawString(1 * inch, 7.1 * inch - offset_y, f"Je soussigné, : {formulaire_p_concierge.nom}  {formulaire_p_concierge.prenom}, en qualité du concierge de l'immeuble 41 rue oued sebou. déclare avoir reçu la somme de {formulaire_p_concierge.montant} dh correspondante á la paie du mois de {formulaire_p_concierge.mois} {formulaire_p_concierge.annee}. ")
+        
+    c.drawString(6 * inch, 8.7 * inch - offset_y, "Signature")
+    
+
+def draw_content_p_concierge(c, formulaire_p_concierge, offset_y):
+    # Obtener el último objeto creado
+    ultimo_registro = FormulairePConcierge.objects.latest('id')
+    ultimo_id = ultimo_registro.id
+
+    c.setFont("Helvetica", 12)
+    print("El formulaire_p_concierge.id : " + str(formulaire_p_concierge.id))
+    
+    c.setFont("Helvetica-Bold", 14)
+    #c.drawString(1 * inch, 6.5 * inch - offset_y, f"RABAT LE: {formulaire_p_concierge.date}")
+    date_str = formulaire_p_concierge.date.strftime("%Y-%m-%d")  # Formatear la fecha
+    c.drawString(1 * inch, 6.5 * inch - offset_y, f"RABAT LE: {date_str}")
+    
+    c.setFont("Helvetica", 12)
+    texto = (f"Je soussigné, : '{formulaire_p_concierge.nom} {formulaire_p_concierge.prenom}', en qualité "
+             f"du concierge de l'immeuble 41 rue oued sebou. déclare avoir reçu la somme de "
+             f"{formulaire_p_concierge.montant} dh correspondante á la paie du mois de "
+             f"{formulaire_p_concierge.mois} {formulaire_p_concierge.annee}.")
+    
+    # Dividir el texto en líneas
+    max_width = 6 * inch  # Ancho máximo del texto en el PDF
+    lines = split_text_into_lines(texto, max_width, c)
+    
+    y = 7.1 * inch - offset_y
+    for line in lines:
+        c.drawString(1 * inch, y, line)
+        y += 0.2 * inch  # Espacio entre líneas
+    
+    c.drawString(6 * inch, 8.7 * inch - offset_y, "Signature")
+
+def split_text_into_lines(texto, max_width, canvas):
+    """Divide el texto en líneas para que se ajuste dentro del ancho máximo."""
+    words = texto.split()
+    lines = []
+    line = ""
+    for word in words:
+        if canvas.stringWidth(line + word + " ") < max_width:
+            line += word + " "
+        else:
+            lines.append(line)
+            line = word + " "
+    lines.append(line)  # Añadir la última línea
+    return lines
+
+
+def generate_p_concierge_temp_pdf(request):
+    if request.method == 'POST':
+        form = EnregistrerFormulairePConciergeForm(request.POST)
+        if form.is_valid():
+            # Crear un objeto temporal de FormulaireCotization
+            formulaire_p_concierge = form.save(commit=False)
+
+            buf = io.BytesIO()
+            c = canvas.Canvas(buf, pagesize=letter, bottomup=0)
+            
+            # Dibujar el contenido en la parte superior
+            draw_content_p_concierge(c, formulaire_p_concierge, offset_y=0)
+            
+            # Dibujar línea separadora
+            c.line(0.5 * inch, 5 * inch, 7.5 * inch, 5 * inch)
+            
+            # Dibujar el contenido en la parte inferior
+            draw_content_p_concierge(c, formulaire_p_concierge, offset_y=6 * inch)
+            
+            c.showPage()
+            c.save()
+            buf.seek(0)
+
+            temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+            with open(temp_file.name, 'wb') as f:
+                f.write(buf.getvalue())
+
+            response = {
+                'pdf_url': request.build_absolute_uri(reverse('serve_p_concierge_temp_pdf', args=[os.path.basename(temp_file.name)]))
+            }
+
+            return JsonResponse(response)
+    
+    return JsonResponse({'error': 'Invalid data'}, status=400)
+
+def serve_p_concierge_temp_pdf(request, filename):
     filepath = os.path.join(tempfile.gettempdir(), filename)
     return FileResponse(open(filepath, 'rb'), content_type='application/pdf')
