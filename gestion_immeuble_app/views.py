@@ -29,6 +29,8 @@ from openpyxl.writer.excel import save_virtual_workbook
 from datetime import date
 from openpyxl.styles import Font
 from django.core import management
+from num2words import num2words
+from PIL import Image
 
 #import datetime
 # Create your views here.
@@ -991,7 +993,11 @@ def draw_content(c, formulaire_cotization, offset_y):
     c.drawString(1 * inch, 7.1 * inch - offset_y, f"Reçu de: {formulaire_cotization.nom} {formulaire_cotization.prenom}")
     c.drawString(1 * inch, 7.3 * inch - offset_y, f"Apt N°: {formulaire_cotization.aptNum}")
     c.drawString(1 * inch, 7.5 * inch - offset_y, f"En qualité de: {formulaire_cotization.liste_proprietaire.proprietaire_locataire}")
-    c.drawString(1 * inch, 7.7 * inch - offset_y, f"La somme de: {formulaire_cotization.montant} (en toutes lettres)")
+     # Convertir el montant en palabras en francés
+    montant_en_lettres = num2words(formulaire_cotization.montant, lang='fr')
+    
+    #c.drawString(1 * inch, 7.7 * inch - offset_y, f"La somme de: {formulaire_cotization.montant} ({montant_en_lettres})")
+    c.drawString(1 * inch, 7.7 * inch - offset_y, f"La somme de: {montant_en_lettres} dhs")
     c.drawString(1 * inch, 7.9 * inch - offset_y, f"Pour motif: {formulaire_cotization.frais_sindic}/{formulaire_cotization.frais_sindic_manual} ({formulaire_cotization.motif_mois}/{formulaire_cotization.motif_annee})")
     c.drawString(3 * inch, 8.3 * inch - offset_y, f"Rabat le: {formulaire_cotization.date.strftime('%Y-%m-%d')}")
     
@@ -999,6 +1005,25 @@ def draw_content(c, formulaire_cotization, offset_y):
     c.drawString(1 * inch, 9.1 * inch - offset_y, f"{formulaire_cotization.liste_proprietaire.proprietaire_locataire}")
     c.drawString(6 * inch, 8.7 * inch - offset_y, "Signature")
     c.drawString(6 * inch, 9.1 * inch - offset_y, "SYNDIC")
+    
+    # Construir la ruta completa a la imagen de la firma
+    firma_path = os.path.join(settings.BASE_DIR, 'static', 'firma_syndic.png')
+    # Abrir, rotar y guardar la imagen temporalmente
+    firma_image = Image.open(firma_path)
+    firma_image = firma_image.rotate(180, expand=True)  # Rotar la imagen 180 grados si está boca abajo
+    # Aplicar un volteo horizontal para ajustar la orientación
+    firma_image = firma_image.transpose(Image.FLIP_LEFT_RIGHT)
+    temp_firma_path = os.path.join(settings.BASE_DIR, 'static', 'temp_firma.png')
+    firma_image.save(temp_firma_path)
+    # Obtener dimensiones de la imagen rotada
+    firma_width, firma_height = firma_image.size
+    firma_width = firma_width * 72 / firma_image.info['dpi'][0]  # Convertir a puntos (pt)
+    firma_height = firma_height * 72 / firma_image.info['dpi'][1]  # Convertir a puntos (pt)    
+    firma_width = 2 * inch  # Ajusta el tamaño de la firma si es necesario
+    firma_height = 1 * inch  # Ajusta el tamaño de la firma si es necesario
+    c.drawImage(temp_firma_path, 5 * inch, 10.1 * inch - offset_y - firma_height, width=firma_width, height=firma_height)
+    # Eliminar la imagen temporal si es necesario
+    os.remove(temp_firma_path)
 
 def formulaire_cotization_pdf(request, id_formulaire_cotization):
     # Crear buffer de flujo de bytes
