@@ -572,6 +572,7 @@ def enregistrer_formulaire_cotization_view(request):
             motif_annee = instance.motif_annee
             frais_sindic = instance.frais_sindic
             liste_proprietaire = instance.liste_proprietaire
+            image_signer = instance.image_signer
            
             #files = request.FILES.getlist('files')
             email_message = EmailMessage(
@@ -590,7 +591,9 @@ def enregistrer_formulaire_cotization_view(request):
             #if image_charge:
                 #mime_type, _ = mimetypes.guess_type(image_charge.path)
                 #email_message.attach(image_charge.name, image_charge.read(), mime_type)
-            
+            if image_signer:
+                mime_type, _ = mimetypes.guess_type(image_signer.path)
+                email_message.attach(image_signer.name, image_signer.read(), mime_type)
             # Adjuntar el archivo
             #email_message.attach(file.name, file.read(), file.content_type)
 

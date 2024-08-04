@@ -30,6 +30,7 @@
         <th scope="col" class="text-center">Année</th>
         <th scope="col" class="text-center">Frais Sindic</th>
         <th scope="col" class="text-center">Frais Sindic Manual</th>
+        <th scope="col" class="text-center">Document Signé</th>
         {% if user.is_superuser %}
         <th scope="col" class="text-center">Imprimer pdf</th>
         {% endif %}
@@ -57,6 +58,16 @@
         <th class="text-wrap" style="max-width: 150px;" scope="row">{{formulaire_cotization.motif_annee}}</th>
         <th class="text-wrap" style="max-width: 150px;" scope="row">{{formulaire_cotization.frais_sindic}}</th>
         <th class="text-wrap" style="max-width: 150px;" scope="row">{{formulaire_cotization.frais_sindic_manual}}</th>
+        
+        <td style="text-align: center;">
+          {% if formulaire_cotization.image_signer %}
+            <a href="{{ formulaire_cotization.image_signer.url }}" target="_blank">
+              
+                <img src="{{ formulaire_cotization.image_signer.url }}" width="20%" alt="{{ formulaire_cotization.image_signer.name }}" />
+             
+            </a>
+          {% endif %}
+        </td>
         <!--
         <td style="text-align: center;">
             {% if formulaire_charge.image_charge %} 

@@ -80,6 +80,7 @@ class EnregistrerFormulaireCotizationForm(forms.ModelForm):
             'motif_annee': forms.Select(attrs={'class': 'form-control'}),
             'frais_sindic': forms.Select(attrs={'class': 'form-control','id': 'id_frais_sindic'}),
             'frais_sindic_manual': forms.TextInput(attrs={'class': 'form-control', 'id': 'id_frais_sindic_manual', 'placeholder': 'Frais Sindic Manual (opcion de escribir o seleccionar)', 'value' :'----'}),
+            'image_signer': forms.ClearableFileInput(attrs={'class': 'form-control', 'name': 'files', 'id': 'formFile'}),
         
         
         }

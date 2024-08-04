@@ -94,7 +94,8 @@ class FormulaireCotization(models.Model):
     motif_annee = models.CharField('Année', max_length=4, choices=annee_choices)
     frais_sindic = models.CharField('Frais Sindic', max_length=120, choices=frais_sindic_choices, blank=True, null=True)
     frais_sindic_manual = models.CharField('Frais Sindic Manual', max_length=120, blank=True, null=True)
-    
+    image_signer = models.FileField('Document Signé', null=True, blank=True, upload_to="uploads/",
+                                    validators=[validate_file_extension])
     
     def __str__(self) -> str:
         return f"FormulaireCotization Nom {self.nom} Prenom {self.prenom} Nº Apt {self.aptNum} Proprietaire/Locataire {self.liste_proprietaire}"
