@@ -112,3 +112,7 @@ class EnregistrerFormulairePConciergeForm(forms.ModelForm):
         
         
         }
+    def __init__(self, *args, **kwargs):
+        super(EnregistrerFormulairePConciergeForm, self).__init__(*args, **kwargs)
+        self.fields['nom'].initial = "AABANE"
+        self.fields['prenom'].initial = "BRAHIM"

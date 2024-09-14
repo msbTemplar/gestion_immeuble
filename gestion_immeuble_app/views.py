@@ -387,7 +387,8 @@ def eliminer_formulaire_liste_proprietaires(request, id_formulaire_liste_proprie
 
 def liste_formulaire_cotization(request):
     # venue_list = Venue.objects.all().order_by('?')
-    la_lista_formulaire_cotization = FormulaireCotization.objects.all()
+    #la_lista_formulaire_cotization = FormulaireCotization.objects.all()
+    la_lista_formulaire_cotization = FormulaireCotization.objects.filter(regle=True)
     total_montant = la_lista_formulaire_cotization.aggregate(total=Sum('montant'))['total']
   
     # Agrupar y sumar Montant por combinación de Nom y Prenom
@@ -749,6 +750,8 @@ def enregistrer_formulaire_p_concierge_view(request):
         if form_p_concierge.is_valid():
             print("Formulario P Concierge válido")
             instance_p_concierge = form_p_concierge.save(commit=False)  # Guardar el formulario sin commit para poder modificar datos antes de guardarlo completamente
+            #nom = instance_p_concierge.nom
+            #prenom = instance_p_concierge.prenom
             nom = instance_p_concierge.nom
             prenom = instance_p_concierge.prenom
             date = instance_p_concierge.date
@@ -757,9 +760,12 @@ def enregistrer_formulaire_p_concierge_view(request):
             annee = instance_p_concierge.annee
             charge_id = form_p_concierge.cleaned_data.get('charge_id')  # Ejemplo de cómo obtener charge_id
             
+            paie_concierge_charge = Charge.objects.get_or_create(nome_charge='PAIE CONCIERGE')[0]
+            
             # Crear instancia del otro formulario y guardarla
             form_charge = EnregistrerFormulaireChargeForm({
-                'charge': charge_id,  # Ejemplo de cómo podrías asignar valores al formulario de carga
+                #'charge': charge_id,  # Ejemplo de cómo podrías asignar valores al formulario de carga
+                'charge': paie_concierge_charge.id,  # Asignar el texto "PAIE CONCIERGE" al campo charge
                 'du': date,  # Ejemplo, ajusta según tus campos
                 'au': date,  # Ejemplo, ajusta según tus campos
                 'date': date,  # Ejemplo, ajusta según tus campos
@@ -842,8 +848,50 @@ def enregistrer_formulaire_p_concierge_view2(request):
     else:
         form = EnregistrerFormulairePConciergeForm()
     return render(request, 'enregistrer_formulaire_p_concierge.html', {'form': form})
-
 def actualiser_formulaire_p_concierge(request, id_formulaire_p_concierge):
+    # Obtener el formulario P Concierge existente
+    formulaire_p_concierge = FormulairePConcierge.objects.get(pk=id_formulaire_p_concierge)
+
+    # Cargar el formulario con los datos existentes
+    form = EnregistrerFormulairePConciergeForm(request.POST or None, request.FILES or None, instance=formulaire_p_concierge)
+
+    if form.is_valid():
+        # Guardar el formulario P Concierge
+        instance_p_concierge = form.save()
+
+        # Obtener o crear la carga 'PAIE CONCIERGE'
+        paie_concierge_charge, created = Charge.objects.get_or_create(nome_charge='PAIE CONCIERGE')
+
+        # Filtrar los registros de FormulaireCharge en lugar de usar get()
+        formulaire_charge_queryset = FormulaireCharge.objects.filter(
+            charge=paie_concierge_charge,
+            date=instance_p_concierge.date
+        )
+
+        # Si existen registros que coinciden con los criterios, actualizarlos
+        if formulaire_charge_queryset.exists():
+            for formulaire_charge in formulaire_charge_queryset:
+                formulaire_charge.montant = instance_p_concierge.montant
+                formulaire_charge.du = instance_p_concierge.date
+                formulaire_charge.au = instance_p_concierge.date
+                formulaire_charge.save()
+        else:
+            # Si no existe ninguno, crear uno nuevo
+            FormulaireCharge.objects.create(
+                charge=paie_concierge_charge,
+                date=instance_p_concierge.date,
+                du=instance_p_concierge.date,
+                au=instance_p_concierge.date,
+                montant=instance_p_concierge.montant
+            )
+
+        return redirect('liste_formulaire_p_concierge')
+
+    context = {'formulaire_p_concierge': formulaire_p_concierge, 'form': form}
+    return render(request, 'gestion_immeuble_app/actualizer_formulaire_p_concierge.html', context)
+
+
+def actualiser_formulaire_p_concierge2(request, id_formulaire_p_concierge):
     formulaire_p_concierge = FormulairePConcierge.objects.get(pk=id_formulaire_p_concierge)
     form = EnregistrerFormulairePConciergeForm(request.POST or None, request.FILES or None,  instance=formulaire_p_concierge)
     if form.is_valid():
