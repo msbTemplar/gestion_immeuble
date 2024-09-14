@@ -1035,7 +1035,9 @@ def draw_content(c, formulaire_cotization, offset_y):
     else:
         c.drawString(1 * inch, 6.5 * inch - offset_y, f"{str(ultimo_id)}")
     #c.drawString(1 * inch, 6.5 * inch - offset_y, f"{str(formulaire_cotization.id + 2205) } " )
-    c.drawString(6 * inch, 6.5 * inch - offset_y, f"{formulaire_cotization.montant}")
+    #c.drawString(6 * inch, 6.5 * inch - offset_y, f"{formulaire_cotization.montant} dhs")
+    c.drawString(6 * inch, 6.5 * inch - offset_y, f"{formulaire_cotization.montant:.2f} dhs")
+    
     
     c.setFont("Helvetica-Bold", 14)
     c.drawString(3 * inch, 6.9 * inch - offset_y, "REÇU")
