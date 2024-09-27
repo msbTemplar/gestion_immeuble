@@ -387,13 +387,15 @@ def eliminer_formulaire_liste_proprietaires(request, id_formulaire_liste_proprie
 
 def liste_formulaire_cotization(request):
     # venue_list = Venue.objects.all().order_by('?')
-    #la_lista_formulaire_cotization = FormulaireCotization.objects.all()
-    la_lista_formulaire_cotization = FormulaireCotization.objects.filter(regle=True)
-    total_montant = la_lista_formulaire_cotization.aggregate(total=Sum('montant'))['total']
+    la_lista_formulaire_cotization = FormulaireCotization.objects.all()
+    la_lista_formulaire_cotization_filtrado = FormulaireCotization.objects.filter(regle=True)
+    #total_montant = la_lista_formulaire_cotization.aggregate(total=Sum('montant'))['total']
+    total_montant = la_lista_formulaire_cotization_filtrado.aggregate(total=Sum('montant'))['total']
+    
   
     # Agrupar y sumar Montant por combinación de Nom y Prenom
     montant_por_usuario = {}
-    for formulaire_cotization in la_lista_formulaire_cotization:
+    for formulaire_cotization in la_lista_formulaire_cotization_filtrado:
         key = (formulaire_cotization.nom, formulaire_cotization.prenom)
         if key in montant_por_usuario:
             montant_por_usuario[key] += formulaire_cotization.montant
