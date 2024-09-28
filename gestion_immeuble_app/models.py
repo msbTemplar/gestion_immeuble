@@ -92,7 +92,9 @@ class FormulaireCotization(models.Model):
     
     motif_mois = models.CharField('Mois', max_length=120, choices=mois_choices)
     motif_annee = models.CharField('Année', max_length=4, choices=annee_choices)
-    frais_sindic = models.CharField('Frais Syndic', max_length=120, choices=frais_sindic_choices, blank=True, null=True)
+    #frais_sindic = models.CharField('Frais Syndic', max_length=120, choices=frais_sindic_choices, blank=True, null=True)
+    frais_sindic = models.CharField('Frais Syndic', max_length=120, choices=frais_sindic_choices, blank=False, null=False)
+    
     frais_sindic_manual = models.CharField('Frais Syndic Manual', max_length=120, blank=True, null=True)
     image_signer = models.FileField('Document Signé', null=True, blank=True, upload_to="uploads/",
                                     validators=[validate_file_extension])

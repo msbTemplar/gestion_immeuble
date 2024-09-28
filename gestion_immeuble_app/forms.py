@@ -79,13 +79,15 @@ class EnregistrerFormulaireCotizationForm(forms.ModelForm):
             'motif_mois': forms.Select(attrs={'class': 'form-control'}),
             'motif_annee': forms.Select(attrs={'class': 'form-control'}),
             'frais_sindic': forms.Select(attrs={'class': 'form-control','id': 'id_frais_sindic'}),
+            #'frais_sindic': forms.Select(choices=FormulaireCotization.frais_sindic_choices, attrs={'class': 'form-control', 'id': 'id_frais_sindic'}),
             'frais_sindic_manual': forms.TextInput(attrs={'class': 'form-control', 'id': 'id_frais_sindic_manual', 'placeholder': 'Frais Syndic Manual (opcion de escribir o seleccionar)', 'value' :'----'}),
             'image_signer': forms.ClearableFileInput(attrs={'class': 'form-control', 'name': 'files', 'id': 'formFile'}),
         
         
         }
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        #super().__init__(*args, **kwargs)
+        super(EnregistrerFormulaireCotizationForm, self).__init__(*args, **kwargs)
         # Obtener el último valor de codeFormCotiz de la base de datos
         last_code = FormulaireCotization.objects.order_by('-codeFormCotiz').first()
         if last_code and last_code.codeFormCotiz is not None:
@@ -93,6 +95,10 @@ class EnregistrerFormulaireCotizationForm(forms.ModelForm):
         else:
             next_code = 2205
         self.fields['codeFormCotiz'].initial = next_code
+        if self.instance and self.instance.frais_sindic:
+            self.fields['frais_sindic'].initial = self.instance.frais_sindic
+            print(list(self.fields['frais_sindic'].choices))
+
 
 class EnregistrerFormulairePConciergeForm(forms.ModelForm):
     class Meta:

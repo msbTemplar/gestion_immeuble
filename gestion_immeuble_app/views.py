@@ -611,7 +611,12 @@ def enregistrer_formulaire_cotization_view(request):
 
 def actualiser_formulaire_cotization(request, id_formulaire_cotization):
     formulaire_cotization = FormulaireCotization.objects.get(pk=id_formulaire_cotization)
+    print(formulaire_cotization.frais_sindic + " " + id_formulaire_cotization )  # Verifica el valor de frais_sindic
     form = EnregistrerFormulaireCotizationForm(request.POST or None, request.FILES or None,  instance=formulaire_cotization)
+    print(form.instance.frais_sindic)  # Verifica que el valor del campo se esté pasando bien al formulario
+    print("moha " + formulaire_cotization.frais_sindic)  # Debe devolver 'Frais Syndic' o el valor correspondiente.
+    
+    
     if form.is_valid():
         form.save()
         return redirect('liste_formulaire_cotization')
