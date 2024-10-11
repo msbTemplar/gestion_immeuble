@@ -31,7 +31,8 @@ from openpyxl.styles import Font
 from django.core import management
 from num2words import num2words
 from PIL import Image
-
+import zipfile
+from io import BytesIO
 #import datetime
 # Create your views here.
 
@@ -1330,6 +1331,129 @@ def backup_database(request):
         
         # Adjuntar el archivo de copia de seguridad al correo
         email_message.attach_file(backup_file_path)
+        
+        #email_message.send(fail_silently=False)
+        # Enviar el correo electrónico
+        email_message.send()
+        
+        #return HttpResponse("Copia de seguridad enviada por correo electrónico correctamente.")
+        return redirect('home')
+    
+    
+    except Exception as e:
+        return HttpResponse(f"Error al crear o enviar la copia de seguridad: {str(e)}")
+
+
+def enviar_db_email(request):
+    try:
+        # Obtener la fecha y hora actual
+        now = datetime.now()
+        
+        # Formatear la fecha y hora como parte del nombre del archivo
+        timestamp = now.strftime('%Y-%m-%d_%H-%M-%S')
+        
+        # Define la ruta donde se almacenará la copia de seguridad dentro del proyecto
+        backup_dir = os.path.join(settings.BASE_DIR, 'db.sqlite3')
+        if not os.path.exists(backup_dir):
+            os.makedirs(backup_dir)
+        
+        # Nombre del archivo de copia de seguridad
+        #backup_file_name = 'backup.json'
+        # Enviar el archivo por correo electrónico
+        subject = 'Copia de seguridad de base de datos'
+        message = 'Adjunto encontrarás la copia de seguridad de la base de datos.'
+        email_message = EmailMessage(
+                subject=f'Contact Form: {subject}',
+                #body=titulo_serie + " " + serie_o_pelicula + " " +  plataforma,
+                body=f'{message}',
+                
+                from_email=settings.EMAIL_HOST_USER,
+                to=['msb.duck@gmail.com', 'msb.tesla@gmail.com', 'msebti2@gmail.com', 'msb.acer@gmail.com'],
+                reply_to=['msebti2@gmail.com']
+            )
+            # Adjuntar cada archivo
+            #for file in files:
+                #email_message.attach(file.name, file.read(), file.content_type)
+            
+            #if image_charge:
+                #mime_type, _ = mimetypes.guess_type(image_charge.path)
+                #email_message.attach(image_charge.name, image_charge.read(), mime_type)
+            
+            # Adjuntar el archivo
+            #email_message.attach(file.name, file.read(), file.content_type)
+            
+            # Enviar el email
+       
+        
+        # Adjuntar el archivo de copia de seguridad al correo
+        email_message.attach_file(backup_dir)
+        
+        #email_message.send(fail_silently=False)
+        # Enviar el correo electrónico
+        email_message.send()
+        
+        #return HttpResponse("Copia de seguridad enviada por correo electrónico correctamente.")
+        return redirect('home')
+    
+    
+    except Exception as e:
+        return HttpResponse(f"Error al crear o enviar la copia de seguridad: {str(e)}")
+    
+
+def enviar_archivos_zip(request):
+    try:
+        # Obtener la fecha y hora actual
+        now = datetime.now()
+        
+        # Formatear la fecha y hora como parte del nombre del archivo
+        timestamp = now.strftime('%Y-%m-%d_%H-%M-%S')
+        
+        # Crear un archivo ZIP en memoria
+        zip_buffer = BytesIO()
+
+            # Ruta completa a la carpeta 'uploads'
+        uploads_dir = os.path.join(settings.MEDIA_ROOT, 'uploads')
+
+            # Comprimir los archivos dentro de 'uploads'
+        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+            for root, dirs, files in os.walk(uploads_dir):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    zip_file.write(file_path, os.path.relpath(file_path, uploads_dir))
+
+            # Preparar el archivo ZIP para el envío (colocar el puntero al inicio)
+        zip_buffer.seek(0)
+        
+        # Nombre del archivo de copia de seguridad
+        #backup_file_name = 'backup.json'
+        # Enviar el archivo por correo electrónico
+        subject = 'Copia de seguridad de base de datos'
+        message = 'Adjunto encontrarás la copia de seguridad de la base de datos.'
+        email_message = EmailMessage(
+                subject=f'Contact Form: {subject}',
+                #body=titulo_serie + " " + serie_o_pelicula + " " +  plataforma,
+                body=f'{message}',
+                
+                from_email=settings.EMAIL_HOST_USER,
+                to=['msb.duck@gmail.com', 'msb.tesla@gmail.com', 'msebti2@gmail.com', 'msb.acer@gmail.com'],
+                reply_to=['msebti2@gmail.com']
+            )
+            # Adjuntar cada archivo
+            #for file in files:
+                #email_message.attach(file.name, file.read(), file.content_type)
+            
+            #if image_charge:
+                #mime_type, _ = mimetypes.guess_type(image_charge.path)
+                #email_message.attach(image_charge.name, image_charge.read(), mime_type)
+            
+            # Adjuntar el archivo
+            #email_message.attach(file.name, file.read(), file.content_type)
+            
+            # Enviar el email
+       
+        
+        # Adjuntar el archivo de copia de seguridad al correo
+        email_message.attach('uploads.zip', zip_buffer.read(), 'application/zip')
         
         #email_message.send(fail_silently=False)
         # Enviar el correo electrónico

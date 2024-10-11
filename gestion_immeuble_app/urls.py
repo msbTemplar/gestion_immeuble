@@ -56,7 +56,8 @@ urlpatterns = [
     path('generate_p_concierge_temp_pdf/', views.generate_p_concierge_temp_pdf, name='generate_p_concierge_temp_pdf'),
     path('serve_p_concierge_temp_pdf/<str:filename>/', views.serve_p_concierge_temp_pdf, name='serve_p_concierge_temp_pdf'),
     path('backup/', views.backup_database, name='backup_database'),
-
+    path('enviar_db_email/', views.enviar_db_email, name='enviar_db_email'),
+    path('enviar_archivos_zip/', views.enviar_archivos_zip, name='enviar_archivos_zip'),
 
 
 ]

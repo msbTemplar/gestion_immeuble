@@ -18,6 +18,8 @@
     {% if user.is_superuser %}
     
       <a class="btn btn-warning" href="{% url 'backup_database' %}">Copie BBDD</a>
+      <a class="btn btn-primary" href="{% url 'enviar_db_email' %}">Copie BBDD fichier principal</a>
+      <a class="btn btn-info" href="{% url 'enviar_archivos_zip' %}">Copie fichiers joins</a>
   
     {% endif %} 
     
