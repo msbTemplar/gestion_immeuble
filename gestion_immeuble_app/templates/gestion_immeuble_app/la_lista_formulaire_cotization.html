@@ -15,7 +15,7 @@
   
   <!-- antes venue_list-->
 
-  <table class="table table-striped table-hover table-bordered border-primary shadow rounded custom-table">
+  <table class="table table-striped table-hover table-bordered border-primary shadow rounded custom-table" id="laLista_cotization">
     <thead>
       <tr>
         <th scope="col" class="text-center">Nº Ordre</th>
@@ -249,6 +249,16 @@
   </nav>
 
   <br />
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      $('#laLista_cotization').DataTable();
+      select: true
+
+    });
+
+
+  </script>
 
 
 
